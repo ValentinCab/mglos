@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="./manifest.webmanifest?v=4">
+  <link rel="manifest" href="./manifest.webmanifest?v=5">
   <meta name="theme-color" content="#42664d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -24,6 +24,7 @@
     @media(min-width:761px){html,body{height:100%;overflow:hidden}.app{height:100dvh;padding:12px 28px;display:flex;flex-direction:column;overflow:hidden}header{gap:11px;padding:0 0 9px}.title{font-size:2.1rem}.sub{margin-top:2px;font-size:.82rem}.header-actions{gap:6px}.header-button{padding:6px 9px;font-size:.8rem}.add{padding:7px 11px;font-size:.82rem}.tools{padding:9px 0 5px}.search{max-width:540px}input[type="search"]{padding:8px 12px 8px 35px;font-size:.84rem}.search svg{left:11px;width:17px}.filter-heading{margin:7px 0 4px;font-size:.74rem}.filters{gap:4px}.chip{padding:3px 7px;font-size:.7rem}header,.tools{flex:none}.workspace{height:auto;min-height:0;flex:1}}
     @keyframes detail-overlay-in{from{opacity:0}to{opacity:1}}@keyframes detail-shell-in{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
     @media(max-width:760px){.app{padding:19px 16px 36px}header{align-items:start;flex-direction:column;padding-bottom:20px}.header-actions,.add{width:100%}.header-button{flex:1}.workspace{grid-template-columns:1fr;gap:16px;height:auto}.workspace>div:first-child{display:block}.terms{display:grid;overflow:visible;padding-right:0}.preview{display:none}.detail-overlay:not([hidden]){animation:detail-overlay-in .12s ease-out both}.detail-overlay:not([hidden]) .detail-shell{animation:detail-shell-in .18s cubic-bezier(.2,.8,.2,1) both}.mobile-detail-content{padding:22px}.detail-shell h2{font-size:1.55rem}.term{padding:12px 5px}.mini-tags{display:flex;margin:0 10px 0 10px;align-items:end}.mini-tags span{font-size:.56rem;line-height:1.2;white-space:nowrap}.term.focused:not(.active){background:transparent;padding-left:11px}.term.focused .term-title{font-size:1.56rem;color:var(--accent)}.letter{padding-top:14px}.tools{padding-top:17px}.sub{font-size:.91rem}.flash-options{grid-template-columns:1fr}.flashcard{min-height:280px;padding:20px}.study{padding:18px}}@media(prefers-reduced-motion:reduce){.detail-overlay:not([hidden]),.detail-overlay:not([hidden]) .detail-shell{animation:none}.term,.term-title{transition:none}}
+    #formulaDialog{overflow:visible}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
@@ -170,8 +171,8 @@
     function rememberRichSelection(){const selection=window.getSelection();if(!selection?.rangeCount)return;const range=selection.getRangeAt(0),editor=range.commonAncestorContainer.nodeType===1?range.commonAncestorContainer:range.commonAncestorContainer.parentElement;const container=editor?.closest?.('.rich-editor');if(container){activeRichEditor=container;richSelection=range.cloneRange()}}
     function useRichCommand(command,value=null){const editor=activeRichEditor||$('#definitionInput');if(!editor)return;editor.focus();if(richSelection&&editor.contains(richSelection.commonAncestorContainer)){const selection=window.getSelection();selection.removeAllRanges();selection.addRange(richSelection)}document.execCommand(command,false,value);rememberRichSelection()}
     function makeFormulaNode(latex){const node=document.createElement('math-span');node.className='formula-inline';node.dataset.latex=latex;node.setAttribute('contenteditable','false');node.setAttribute('title','Doble clic para editar la fórmula');node.textContent=latex;return node}
-    function clearFormulaState(){formulaInsertRange=null;formulaTargetEditor=null;editingFormulaNode=null;window.mathVirtualKeyboard?.hide()}
-    function openFormulaEditor(node=null){const editor=activeRichEditor||$('#definitionInput');if(!editor||!customElements.get('math-field')){alert('No se pudo cargar el editor de fórmulas. Probá de nuevo con conexión a internet.');return}if(node){editingFormulaNode=node;formulaTargetEditor=editor}else{editor.focus();rememberRichSelection();formulaInsertRange=richSelection?.cloneRange()||null;formulaTargetEditor=editor;editingFormulaNode=null}const field=$('#formulaField');field.value=safeLatex(node?.dataset.latex||node?.textContent||'');$('#formulaDialog').showModal();setTimeout(()=>field.focus(),0)}
+    function clearFormulaState(){formulaInsertRange=null;formulaTargetEditor=null;editingFormulaNode=null;const keyboard=window.mathVirtualKeyboard;if(keyboard){keyboard.hide();keyboard.container=document.body}}
+    function openFormulaEditor(node=null){const editor=activeRichEditor||$('#definitionInput');if(!editor||!customElements.get('math-field')){alert('No se pudo cargar el editor de fórmulas. Probá de nuevo con conexión a internet.');return}if(node){editingFormulaNode=node;formulaTargetEditor=editor}else{editor.focus();rememberRichSelection();formulaInsertRange=richSelection?.cloneRange()||null;formulaTargetEditor=editor;editingFormulaNode=null}const dialog=$('#formulaDialog'),keyboard=window.mathVirtualKeyboard;if(keyboard)keyboard.container=dialog;const field=$('#formulaField');field.value=safeLatex(node?.dataset.latex||node?.textContent||'');dialog.showModal();setTimeout(()=>field.focus(),0)}
     function closeFormulaDialog(){$('#formulaDialog').close()}
     function insertFormulaShortcut(latex){const field=$('#formulaField');field.focus();field.insert(latex,{focus:true})}
     function insertFormula(){const latex=safeLatex($('#formulaField').value);if(!latex.trim())return;const editor=formulaTargetEditor||activeRichEditor||$('#definitionInput'),node=makeFormulaNode(latex);if(editingFormulaNode?.isConnected){editingFormulaNode.replaceWith(node);activeRichEditor=editor;closeFormulaDialog();return}editor.focus();if(formulaInsertRange&&editor.contains(formulaInsertRange.commonAncestorContainer)){formulaInsertRange.deleteContents();formulaInsertRange.insertNode(node);const spacer=document.createTextNode(' ');node.after(spacer);const range=document.createRange(),selection=window.getSelection();range.setStartAfter(spacer);range.collapse(true);selection.removeAllRanges();selection.addRange(range);richSelection=range.cloneRange()}else editor.append(node,document.createTextNode(' '));activeRichEditor=editor;closeFormulaDialog()}
@@ -199,7 +200,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=4', { updateViaCache: 'none' });
+        navigator.serviceWorker.register('./sw.js?v=5', { updateViaCache: 'none' });
       });
     }
   </script>
