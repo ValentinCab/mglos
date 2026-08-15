@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-glosario-v6';
+const CACHE_NAME = 'mi-glosario-v7';
 
 const APP_FILES = [
   './',
