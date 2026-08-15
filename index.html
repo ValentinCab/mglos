@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="./manifest.webmanifest?v=4">
+  <meta name="theme-color" content="#42664d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Mi glosario</title>
   <style>
     :root { --ink:#252522; --muted:#73736c; --paper:#f7f6f1; --line:#dedbd1; --accent:#42664d; --accent-soft:#e3ece3; --tag:#e9ebe5; --input:#fffefa; }
@@ -191,6 +195,13 @@
     $('#imageInput').onchange=async()=>{const files=[...$('#imageInput').files].filter(f=>f.type.startsWith('image/')).slice(0,6);if(!files.length)return;try{renderImagePreviews(await Promise.all(files.map(compactImage)))}catch{alert('No se pudo leer una de las imágenes. Probá con otro archivo.')}};
     $('#conceptForm').onsubmit=async e=>{e.preventDefault();const term=$('#termInput').value.trim(),definition=sanitizeRichHtml($('#definitionInput').innerHTML),notes=sanitizeRichHtml($('#notesInput').innerHTML);const tags=[...new Set($('#tagsInput').value.split(',').map(t=>t.trim().replace(/^#/,'')).filter(Boolean))];if(!term||!plainRich(definition).trim())return;const old=editingId&&concepts.find(c=>c.id===editingId);let images=old?.images||[];const files=[...$('#imageInput').files].filter(f=>f.type.startsWith('image/')).slice(0,6);if(files.length)images=await Promise.all(files.map(compactImage));const obj={id:editingId||crypto.randomUUID(),term,definition,notes,tags,images};if(editingId)concepts=concepts.map(c=>c.id===editingId?obj:c);else concepts.push(obj);selectedId=obj.id;try{save()}catch{alert('Las imágenes ocupan demasiado para esta maqueta local. Usá archivos más chicos; con Firebase van en Storage, no dentro del glosario.');return}$('#conceptDialog').close();render()};
     $('#search').oninput=()=>{ignoreTermObserver=true;renderList()};$('#clearFilters').onclick=()=>{activeTags.clear();render()};setupRichEditors();setTheme(localStorage.getItem(themeKey)==='dark');render();startFirebaseSync();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=4', { updateViaCache: 'none' });
+      });
+    }
   </script>
 </body>
 </html>
