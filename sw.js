@@ -1,11 +1,11 @@
-const CACHE_NAME = "mi-glosario-v1";
+const CACHE_NAME = "mi-glosario-v2";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -39,7 +39,6 @@ self.addEventListener("fetch", (event) => {
         .then((response) => {
           const url = new URL(event.request.url);
 
-          // Solo guarda archivos de tu propia página, no Firebase ni servicios externos.
           if (url.origin === self.location.origin) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
