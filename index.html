@@ -79,9 +79,9 @@
   <dialog id="formulaDialog">
     <div class="modal formula-modal">
       <div class="modal-head"><h2>Fórmula</h2><button class="close" type="button" id="closeFormulaDialog" aria-label="Cerrar fórmula">×</button></div>
-      <p class="hint">Escribí con tu teclado habitual. La vista de abajo transforma fracciones, potencias, subíndices y raíces.</p>
+      <p class="hint">Escribí con tu teclado habitual. Para una fracción usá <strong>(numerador)/(denominador)</strong>; después del segundo paréntesis seguís afuera de ella.</p>
       <div class="formula-shortcuts" aria-label="Atajos de fórmula"><button type="button" data-formula-source="()/()" data-caret-back="4" title="Fracción">a⁄b</button><button type="button" data-formula-source="^()" data-caret-back="1" title="Superíndice">xⁿ</button><button type="button" data-formula-source="_()" data-caret-back="1" title="Subíndice">xₙ</button><button type="button" data-formula-source="sqrt()" data-caret-back="1" title="Raíz cuadrada">√</button></div>
-      <textarea id="formulaSource" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="Escritura de fórmula" placeholder="Ej.: (a+b)/(x-y), x^2, H_2O o sqrt(25)"></textarea>
+      <textarea id="formulaSource" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="Escritura de fórmula" placeholder="Ej.: (a+b)/(x-y) = 2, x^2, H_2O o sqrt(25)"></textarea>
       <math-field id="formulaPreview" class="formula-preview" read-only aria-label="Vista previa de fórmula"></math-field>
       <div class="modal-footer"><button class="secondary" type="button" id="cancelFormulaButton">Cancelar</button><button class="save" type="button" id="insertFormulaButton">Insertar fórmula</button></div>
     </div>
@@ -278,14 +278,61 @@
       }
       return -1;
     }
+    function splitTopLevelAdditive(text){
+      let round=0,curly=0,start=0;
+      const parts=[];
+      for(let i=0;i<text.length;i++){
+        if(text[i]==='(')round++;
+        else if(text[i]===')')round=Math.max(0,round-1);
+        else if(text[i]==='{')curly++;
+        else if(text[i]==='}')curly=Math.max(0,curly-1);
+        else if(!round&&!curly&&(text[i]==='+'||text[i]==='-')&&i>start){
+          parts.push(text.slice(start,i),text[i]);
+          start=i+1;
+        }
+      }
+      if(parts.length)parts.push(text.slice(start));
+      return parts;
+    }
+    function closingParenthesis(text,start){
+      if(text[start]!=='(')return -1;
+      let depth=1;
+      for(let i=start+1;i<text.length;i++){
+        if(text[i]==='(')depth++;
+        else if(text[i]===')'&&!--depth)return i;
+      }
+      return -1;
+    }
+    function parenthesizedFractionAt(text,start){
+      const numeratorEnd=closingParenthesis(text,start);
+      if(numeratorEnd<0)return null;
+      let slash=numeratorEnd+1;
+      while(/\s/.test(text[slash]||''))slash++;
+      if(text[slash]!=='/')return null;
+      let denominatorStart=slash+1;
+      while(/\s/.test(text[denominatorStart]||''))denominatorStart++;
+      const denominatorEnd=closingParenthesis(text,denominatorStart);
+      if(denominatorEnd<0)return null;
+      return {
+        numerator:text.slice(start+1,numeratorEnd),
+        denominator:text.slice(denominatorStart+1,denominatorEnd),
+        end:denominatorEnd+1
+      };
+    }
     function formulaSourceToLatex(source){
       const value=safeLatex(source).trim();
       if(!value)return '';
       if(/\\[a-zA-Z]+/.test(value))return value;
-      const slash=findTopLevelSlash(value);
-      if(slash>0&&slash<value.length-1)return '\\frac{'+formulaSourceToLatex(value.slice(0,slash))+'}{'+formulaSourceToLatex(value.slice(slash+1))+'}';
       let result='';
       for(let i=0;i<value.length;i++){
+        // La sintaxis de fracción es siempre (numerador)/(denominador).
+        // El segundo paréntesis marca el final, como el espacio en Word, y lo que siga queda fuera.
+        const fraction=parenthesizedFractionAt(value,i);
+        if(fraction){
+          result+='\\frac{'+formulaSourceToLatex(fraction.numerator)+'}{'+formulaSourceToLatex(fraction.denominator)+'}';
+          i=fraction.end-1;
+          continue;
+        }
         const root=value.startsWith('sqrt(',i)?5:(value[i]==='√'&&value[i+1]==='('?2:0);
         if(root){
           let depth=1,end=i+root;
