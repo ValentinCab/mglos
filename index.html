@@ -30,6 +30,13 @@
     #formulaDialog[open].formula-layer{position:fixed;inset:0;z-index:20;display:block;max-width:none;width:100%;margin:0;padding:12px;border:0;border-radius:0;background:rgba(31,33,28,.43);overflow:auto}
     #formulaDialog[open].formula-layer .formula-modal{width:min(660px,100%);margin:clamp(12px,7vh,72px) auto 36px;border-radius:16px;background:var(--paper);box-shadow:0 24px 80px rgba(0,0,0,.25)}
     @media(max-width:760px){#formulaDialog[open].formula-layer{padding:12px}#formulaDialog[open].formula-layer .formula-modal{margin:8px auto 36px;padding:20px}.formula-pad button{min-height:37px;font-size:.8rem}}@media(min-width:761px){.formula-pad{display:none}}
+    /* Fórmulas: la escritura se hace con el teclado nativo del dispositivo. */
+    .formula-inline{min-width:0;border:0;pointer-events:auto}
+    .formula-inline::part(menu-toggle),.formula-inline::part(virtual-keyboard-toggle){display:none}
+    #formulaSource{display:block;min-height:92px;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--ink);padding:12px;font:1rem/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}
+    #formulaSource:focus{outline:0;border-color:#98b19c;box-shadow:0 0 0 3px #dce8de}
+    .formula-preview{display:block;min-height:58px;width:100%;margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:10px;background:var(--input);font-size:1.25rem}
+    .formula-preview::part(menu-toggle),.formula-preview::part(virtual-keyboard-toggle){display:none}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
@@ -72,10 +79,10 @@
   <dialog id="formulaDialog">
     <div class="modal formula-modal">
       <div class="modal-head"><h2>Fórmula</h2><button class="close" type="button" id="closeFormulaDialog" aria-label="Cerrar fórmula">×</button></div>
-      <p class="hint">Escribí normalmente o usá los atajos. En computadora también sirven <strong>/</strong>, <strong>^</strong> y <strong>_</strong>.</p>
-      <div class="formula-shortcuts" aria-label="Atajos de fórmula"><button type="button" data-formula-shortcut="\frac{#@}{#?}" title="Fracción">a⁄b</button><button type="button" data-formula-shortcut="#@^{#?}" title="Superíndice">xⁿ</button><button type="button" data-formula-shortcut="#@_{#?}" title="Subíndice">xₙ</button><button type="button" data-formula-shortcut="\sqrt{#0}" title="Raíz cuadrada">√</button></div>
-      <math-field id="formulaField" math-virtual-keyboard-policy="manual" aria-label="Editor de fórmula"></math-field>
-      <div class="formula-pad" id="formulaPad" aria-label="Teclado de fórmula"></div>
+      <p class="hint">Escribí con tu teclado habitual. La vista de abajo transforma fracciones, potencias, subíndices y raíces.</p>
+      <div class="formula-shortcuts" aria-label="Atajos de fórmula"><button type="button" data-formula-source="()/()" data-caret-back="4" title="Fracción">a⁄b</button><button type="button" data-formula-source="^()" data-caret-back="1" title="Superíndice">xⁿ</button><button type="button" data-formula-source="_()" data-caret-back="1" title="Subíndice">xₙ</button><button type="button" data-formula-source="sqrt()" data-caret-back="1" title="Raíz cuadrada">√</button></div>
+      <textarea id="formulaSource" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="Escritura de fórmula" placeholder="Ej.: (a+b)/(x-y), x^2, H_2O o sqrt(25)"></textarea>
+      <math-field id="formulaPreview" class="formula-preview" read-only aria-label="Vista previa de fórmula"></math-field>
       <div class="modal-footer"><button class="secondary" type="button" id="cancelFormulaButton">Cancelar</button><button class="save" type="button" id="insertFormulaButton">Insertar fórmula</button></div>
     </div>
   </dialog>
@@ -111,9 +118,9 @@
     </div>
   </section>
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js';
-    import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js';
+  <script>
+    let initializeApp,getFirestore,doc,onSnapshot,setDoc,serverTimestamp;
+    let firestore=null,glossaryRef=null;
 
     const firebaseConfig = {
       apiKey: 'AIzaSyC8Vo_Gc3rI28M4MY5x5T5VT81h4QEDUBs',
@@ -123,9 +130,6 @@
       messagingSenderId: '474281185827',
       appId: '1:474281185827:web:fef39fcdeeffcf564f9796'
     };
-    const firebaseApp = initializeApp(firebaseConfig);
-    const firestore = getFirestore(firebaseApp);
-    const glossaryRef = doc(firestore, 'glosarios', 'compartido');
 
     const starter = [
       {id:'1', term:'Axón', definition:'Prolongación de la neurona que transmite el impulso nervioso hacia otras células.', notes:'Pensalo como el “cable de salida” de la neurona. Puede estar recubierto de mielina.', tags:['Unidad 2','Sistema nervioso','Estructura'],images:[]},
@@ -158,7 +162,20 @@
     async function writeCloud(){try{await setDoc(glossaryRef,{concepts:concepts.map(conceptForCloud),updatedAt:serverTimestamp()},{merge:true})}catch(error){console.error('FIRESTORE_WRITE_ERROR',error);if(!firebaseErrorShown){firebaseErrorShown=true;alert('No se pudo sincronizar con Firebase. Tus cambios siguen guardados en este dispositivo.')}}}
     function queueCloudWrite(){clearTimeout(firebaseSyncTimer);firebaseSyncTimer=setTimeout(writeCloud,250)}
     function save(){saveLocal();if(firebaseReady)queueCloudWrite()}
-    function startFirebaseSync(){onSnapshot(glossaryRef,async snapshot=>{firebaseReady=true;const cloudConcepts=snapshot.data()?.concepts;if(Array.isArray(cloudConcepts)){concepts=cloudConcepts.map(conceptFromCloud);selectedId=concepts.some(c=>c.id===selectedId)?selectedId:concepts[0]?.id;saveLocal();render();return}await writeCloud()},error=>{firebaseReady=false;console.error('FIRESTORE_LISTEN_ERROR',error);if(!firebaseErrorShown){firebaseErrorShown=true;alert('Firebase no se pudo conectar. La app seguirá usando la copia guardada en este dispositivo.')}})}
+    async function initFirebase(){
+      try{
+        ({initializeApp}=await import('https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js'));
+        ({getFirestore,doc,onSnapshot,setDoc,serverTimestamp}=await import('https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js'));
+        const firebaseApp=initializeApp(firebaseConfig);
+        firestore=getFirestore(firebaseApp);
+        glossaryRef=doc(firestore,'glosarios','compartido');
+        startFirebaseSync();
+      }catch(error){
+        console.warn('FIREBASE_INIT_ERROR',error);
+        // La interfaz sigue funcionando con localStorage, incluso desde file://.
+      }
+    }
+    function startFirebaseSync(){if(!glossaryRef||!onSnapshot)return;onSnapshot(glossaryRef,async snapshot=>{firebaseReady=true;const cloudConcepts=snapshot.data()?.concepts;if(Array.isArray(cloudConcepts)){concepts=cloudConcepts.map(conceptFromCloud);selectedId=concepts.some(c=>c.id===selectedId)?selectedId:concepts[0]?.id;saveLocal();render();return}await writeCloud()},error=>{firebaseReady=false;console.error('FIRESTORE_LISTEN_ERROR',error);if(!firebaseErrorShown){firebaseErrorShown=true;alert('Firebase no se pudo conectar. La app seguirá usando la copia guardada en este dispositivo.')}})}
     function sorted(){return [...concepts].sort((a,b)=>collator.compare(a.term,b.term))}
     function shown(){const q=$('#search').value.trim().toLocaleLowerCase('es');return sorted().filter(c=>{const text=[c.term,plainRich(c.definition),plainRich(c.notes),...c.tags].join(' ').toLocaleLowerCase('es');return (!q||text.includes(q))&&[...activeTags].every(tag=>c.tags.includes(tag))})}
     function allTags(){return [...new Set(concepts.flatMap(c=>c.tags))].sort((a,b)=>collator.compare(a,b))}
@@ -204,7 +221,165 @@
     function compactImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=reject;reader.onload=()=>{const img=new Image();img.onerror=reject;img.onload=()=>{const max=1280,scale=Math.min(1,max/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/webp',.78))};img.src=reader.result};reader.readAsDataURL(file)})}
     $('#imageInput').onchange=async()=>{const files=[...$('#imageInput').files].filter(f=>f.type.startsWith('image/')).slice(0,6);if(!files.length)return;try{renderImagePreviews(await Promise.all(files.map(compactImage)))}catch{alert('No se pudo leer una de las imágenes. Probá con otro archivo.')}};
     $('#conceptForm').onsubmit=async e=>{e.preventDefault();const term=$('#termInput').value.trim(),definition=sanitizeRichHtml($('#definitionInput').innerHTML),notes=sanitizeRichHtml($('#notesInput').innerHTML);const tags=[...new Set($('#tagsInput').value.split(',').map(t=>t.trim().replace(/^#/,'')).filter(Boolean))];if(!term||!plainRich(definition).trim())return;const old=editingId&&concepts.find(c=>c.id===editingId);let images=old?.images||[];const files=[...$('#imageInput').files].filter(f=>f.type.startsWith('image/')).slice(0,6);if(files.length)images=await Promise.all(files.map(compactImage));const obj={id:editingId||crypto.randomUUID(),term,definition,notes,tags,images};if(editingId)concepts=concepts.map(c=>c.id===editingId?obj:c);else concepts.push(obj);selectedId=obj.id;try{save()}catch{alert('Las imágenes ocupan demasiado para esta maqueta local. Usá archivos más chicos; con Firebase van en Storage, no dentro del glosario.');return}$('#conceptDialog').close();render()};
-    $('#search').oninput=()=>{ignoreTermObserver=true;renderList()};$('#clearFilters').onclick=()=>{activeTags.clear();render()};setupRichEditors();setTheme(localStorage.getItem(themeKey)==='dark');render();startFirebaseSync();
+    /*
+      Se conserva MathLive para mostrar la fórmula, pero no para capturar
+      escritura en el teléfono: el textarea abre el teclado normal del sistema.
+    */
+    function formulaElement(doc,latex,source){
+      const node=doc.createElement('math-field');
+      node.className='formula-inline';
+      node.setAttribute('read-only','');
+      node.setAttribute('contenteditable','false');
+      node.setAttribute('title','Doble clic para editar la fórmula');
+      node.dataset.latex=safeLatex(latex);
+      node.dataset.formulaSource=safeLatex(source||latex);
+      node.textContent=node.dataset.latex;
+      return node;
+    }
+    function sanitizeRichHtml(value){
+      const doc=new DOMParser().parseFromString(String(value||''),'text/html');
+      const allowed=new Set(['B','STRONG','I','EM','U','BR','DIV','P','SPAN','FONT','MATH-FIELD']);
+      function clean(node){
+        [...node.childNodes].forEach(clean);
+        if(node.nodeType!==1)return;
+        const tag=node.tagName;
+        if(tag==='SCRIPT'||tag==='STYLE'){node.remove();return}
+        const legacy=tag==='MATH-SPAN'&&node.classList.contains('formula-inline');
+        if(legacy){
+          const latex=safeLatex(node.getAttribute('data-latex')||node.textContent);
+          if(latex)node.replaceWith(formulaElement(doc,latex,node.getAttribute('data-formula-source')||latex));else node.remove();
+          return;
+        }
+        if(!allowed.has(tag)){node.replaceWith(...node.childNodes);return}
+        const isFormula=tag==='MATH-FIELD'&&node.classList.contains('formula-inline');
+        const latex=isFormula?safeLatex(node.getAttribute('data-latex')||node.textContent):'';
+        const source=isFormula?safeLatex(node.getAttribute('data-formula-source')||latex):'';
+        const color=tag==='FONT'?node.getAttribute('color'):node.style.color;
+        if(isFormula){
+          if(latex)node.replaceWith(formulaElement(doc,latex,source));else node.remove();
+          return;
+        }
+        [...node.attributes].forEach(a=>node.removeAttribute(a.name));
+        if(color){if(tag==='FONT')node.setAttribute('color',color);else node.style.color=color}
+      }
+      [...doc.body.childNodes].forEach(clean);
+      return doc.body.innerHTML;
+    }
+    function richHtml(value){const raw=String(value??'');return /<\/?[a-z][\s\S]*>/i.test(raw)?sanitizeRichHtml(raw):esc(raw).replace(/\n/g,'<br>')}
+    function plainRich(value){const raw=String(value??'');if(!/<\/?[a-z][\s\S]*>/i.test(raw))return raw;const doc=new DOMParser().parseFromString(sanitizeRichHtml(raw),'text/html');return doc.body.textContent||''}
+    function findTopLevelSlash(text){
+      let round=0,curly=0;
+      for(let i=0;i<text.length;i++){
+        if(text[i]==='(')round++;
+        else if(text[i]===')')round=Math.max(0,round-1);
+        else if(text[i]==='{')curly++;
+        else if(text[i]==='}')curly=Math.max(0,curly-1);
+        else if(text[i]==='/'&&!round&&!curly)return i;
+      }
+      return -1;
+    }
+    function formulaSourceToLatex(source){
+      const value=safeLatex(source).trim();
+      if(!value)return '';
+      if(/\\[a-zA-Z]+/.test(value))return value;
+      const slash=findTopLevelSlash(value);
+      if(slash>0&&slash<value.length-1)return '\\frac{'+formulaSourceToLatex(value.slice(0,slash))+'}{'+formulaSourceToLatex(value.slice(slash+1))+'}';
+      let result='';
+      for(let i=0;i<value.length;i++){
+        const root=value.startsWith('sqrt(',i)?5:(value[i]==='√'&&value[i+1]==='('?2:0);
+        if(root){
+          let depth=1,end=i+root;
+          while(end<value.length&&depth){if(value[end]==='(')depth++;if(value[end]===')')depth--;end++}
+          if(!depth){result+='\\sqrt{'+formulaSourceToLatex(value.slice(i+root,end-1))+'}';i=end-1;continue}
+        }
+        result+=value[i];
+      }
+      return result
+        .replace(/\bpi\b/gi,'\\pi')
+        .replace(/\^(\(([^()]*)\)|([A-Za-z0-9]))/g,(_,all,group,single)=>'^{' +(group??single)+ '}')
+        .replace(/_(\(([^()]*)\)|([A-Za-z0-9]))/g,(_,all,group,single)=>'_{' +(group??single)+ '}')
+        .replace(/(^|[^\\]) /g,(_,before)=>before+'\\ ');
+    }
+    function updateFormulaPreview(){
+      const preview=$('#formulaPreview');
+      if(!preview)return;
+      preview.value=formulaSourceToLatex($('#formulaSource').value);
+      preview.readOnly=true;
+      preview.mathVirtualKeyboardPolicy='manual';
+    }
+    function makeFormulaNode(latex,source){
+      const node=formulaElement(document,latex,source);
+      node.value=latex;
+      node.mathVirtualKeyboardPolicy='manual';
+      return node;
+    }
+    function clearFormulaState(){
+      formulaInsertRange=null;formulaTargetEditor=null;editingFormulaNode=null;
+      window.mathVirtualKeyboard?.hide();
+    }
+    function openFormulaEditor(node=null){
+      const editor=activeRichEditor||$('#definitionInput');
+      if(!editor||!customElements.get('math-field')){alert('No se pudo cargar el editor de fórmulas. Probá de nuevo con conexión a internet.');return}
+      if(node){editingFormulaNode=node;formulaTargetEditor=editor}
+      else{editor.focus();rememberRichSelection();formulaInsertRange=richSelection?.cloneRange()||null;formulaTargetEditor=editor;editingFormulaNode=null}
+      const source=$('#formulaSource');
+      source.value=safeLatex(node?.dataset.formulaSource||node?.dataset.latex||node?.textContent||'');
+      updateFormulaPreview();
+      $('#formulaDialog').showModal();
+      setTimeout(()=>source.focus(),0);
+    }
+    function closeFormulaDialog(){$('#formulaDialog').close();window.mathVirtualKeyboard?.hide()}
+    function insertFormulaShortcut(template,caretBack=0){
+      const field=$('#formulaSource'),start=field.selectionStart??field.value.length,end=field.selectionEnd??start;
+      field.setRangeText(template,start,end,'end');
+      const caret=Math.max(start,start+template.length-Number(caretBack||0));
+      field.setSelectionRange(caret,caret);
+      field.focus();
+      updateFormulaPreview();
+    }
+    function insertFormula(){
+      const source=$('#formulaSource').value.trim();
+      const latex=safeLatex(formulaSourceToLatex(source));
+      if(!latex)return;
+      const editor=formulaTargetEditor||activeRichEditor||$('#definitionInput'),node=makeFormulaNode(latex,source);
+      if(editingFormulaNode?.isConnected){editingFormulaNode.replaceWith(node);activeRichEditor=editor;closeFormulaDialog();return}
+      editor.focus();
+      if(formulaInsertRange&&editor.contains(formulaInsertRange.commonAncestorContainer)){
+        formulaInsertRange.deleteContents();formulaInsertRange.insertNode(node);
+        const spacer=document.createTextNode(' ');node.after(spacer);
+        const range=document.createRange(),selection=window.getSelection();
+        range.setStartAfter(spacer);range.collapse(true);selection.removeAllRanges();selection.addRange(range);richSelection=range.cloneRange();
+      }else editor.append(node,document.createTextNode(' '));
+      activeRichEditor=editor;closeFormulaDialog();
+    }
+    function setupRichEditors(){
+      document.addEventListener('selectionchange',rememberRichSelection);
+      document.querySelectorAll('.rich-editor').forEach(editor=>{
+        editor.addEventListener('focus',()=>activeRichEditor=editor);
+        editor.addEventListener('dblclick',event=>{
+          const node=event.target.closest?.('math-field.formula-inline');
+          if(!node)return;
+          event.preventDefault();event.stopPropagation();activeRichEditor=editor;openFormulaEditor(node);
+        });
+      });
+      document.querySelectorAll('[data-command]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();useRichCommand(button.dataset.command)}));
+      document.querySelectorAll('[data-symbol]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();useRichCommand('insertText',button.dataset.symbol)}));
+      document.querySelectorAll('[data-color]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();useRichCommand('foreColor',button.dataset.color)}));
+      document.querySelectorAll('[data-formula]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();openFormulaEditor()}));
+      document.querySelectorAll('[data-formula-source]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();insertFormulaShortcut(button.dataset.formulaSource,button.dataset.caretBack)}));
+      $('#formulaSource').addEventListener('input',updateFormulaPreview);
+      $('#formulaSource').addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();insertFormula()}});
+      $('#closeFormulaDialog').onclick=closeFormulaDialog;
+      $('#cancelFormulaButton').onclick=closeFormulaDialog;
+      $('#insertFormulaButton').onclick=insertFormula;
+      $('#formulaDialog').addEventListener('cancel',event=>{event.preventDefault();closeFormulaDialog()});
+    }
+    $('#search').oninput=()=>{ignoreTermObserver=true;renderList()};
+    $('#clearFilters').onclick=()=>{activeTags.clear();render()};
+    setupRichEditors();
+    setTheme(localStorage.getItem(themeKey)==='dark');
+    render();
+    initFirebase();
   </script>
   <script>
     if ('serviceWorker' in navigator) {
