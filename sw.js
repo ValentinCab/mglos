@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-glosario-v8';
+const CACHE_NAME = 'mi-glosario-v9';
 
 const APP_FILES = [
   './',
@@ -29,7 +29,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  // La página se busca primero en internet: evita ver index.html viejo.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -45,7 +44,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Íconos y demás recursos: caché primero.
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
