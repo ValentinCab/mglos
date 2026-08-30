@@ -42,7 +42,7 @@
     .editor-toolbar button.painter-active{background:var(--accent);color:#fff}.editor-toolbar select{height:28px;max-width:94px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:.75rem}
     .concept-link{color:#1f5f42!important;font-weight:750;text-decoration:underline;cursor:pointer}.concept-link:hover{color:var(--accent)!important}
     .link-picker{display:flex;gap:4px;align-items:center;min-width:165px}.link-picker select{flex:1}.tag-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.tag-suggestions button{border:1px solid var(--line);background:var(--tag);color:var(--ink);border-radius:999px;padding:4px 8px;font-size:.75rem}.tag-suggestions button.selected{color:var(--accent);border-color:var(--accent)}
-    .formula-inline.formula-selected{outline:2px solid var(--accent)}.formula-inline[data-formula-size="2"]{font-size:.82em}.formula-inline[data-formula-size="3"]{font-size:1em}.formula-inline[data-formula-size="4"]{font-size:1.25em}.formula-inline[data-formula-size="5"]{font-size:1.5em}.filter-label{width:100%;margin-top:4px;color:var(--muted);font-size:.72rem;font-weight:750;text-transform:uppercase;letter-spacing:.06em}.subject-chip{font-weight:750}.toolbar-symbols{display:flex;align-items:center;gap:2px}.editor-toolbar .toolbar-symbols button{min-width:25px;font-size:.94rem}.editor-toolbar .symbol-add{font-size:1rem;font-weight:650;color:var(--accent)}
+    .formula-inline.formula-selected{outline:2px solid var(--accent)}.formula-inline[data-formula-size="2"]{font-size:.82em}.formula-inline[data-formula-size="3"]{font-size:1em}.formula-inline[data-formula-size="4"]{font-size:1.25em}.formula-inline[data-formula-size="5"]{font-size:1.5em}.filter-label{width:100%;margin-top:4px;color:var(--muted);font-size:.72rem;font-weight:750;text-transform:uppercase;letter-spacing:.06em}.subject-chip{font-weight:750}.toolbar-symbols{display:flex;align-items:center;gap:2px}.editor-toolbar .toolbar-symbols button{min-width:25px;font-size:.94rem}.editor-toolbar .symbol-add{font-size:1rem;font-weight:650;color:var(--accent)}.table-tools{display:flex;align-items:center;gap:2px}.editor-toolbar .table-tools button{min-width:25px;font-size:.78rem}.study-table{border-collapse:collapse;table-layout:fixed;max-width:100%;margin:13px 0;display:table}.study-table td,.study-table th{min-width:76px;border:1px solid #6d736d;padding:7px 8px;vertical-align:middle;text-align:left}.study-table.no-borders td,.study-table.no-borders th{border:0}.study-table td:focus,.study-table th:focus{outline:2px solid var(--accent);outline-offset:-2px}.table-size-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:12px 0}.table-size-grid button{aspect-ratio:1;border:1px solid var(--line);border-radius:4px;background:var(--input)}.table-size-grid button.selected{background:var(--accent);border-color:var(--accent)}.table-size-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}.table-size-inputs label{margin:0}.table-size-inputs input{margin-top:5px}.rich-editor{overflow-x:auto}@media(max-width:760px){.study-table td,.study-table th{min-width:68px;padding:6px}.table-size-grid{grid-template-columns:repeat(6,1fr)}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
@@ -91,6 +91,16 @@
       <textarea id="formulaSource" inputmode="text" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="Escritura de fórmula" placeholder="Ej.: (a+b)/(x-y) = 2, x^2, H_2O o sqrt(25)"></textarea>
       <math-field id="formulaPreview" class="formula-preview" read-only aria-label="Vista previa de fórmula"></math-field>
       <div class="modal-footer"><button class="secondary" type="button" id="cancelFormulaButton">Cancelar</button><button class="save" type="button" id="insertFormulaButton">Insertar fórmula</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="tableDialog">
+    <div class="modal table-modal">
+      <div class="modal-head"><h2>Tabla</h2><button class="close" type="button" id="closeTableDialog" aria-label="Cerrar tabla">×</button></div>
+      <p class="hint">Elegí el tamaño inicial. Después podés sumar o quitar filas y columnas desde la barra.</p>
+      <div class="table-size-grid" id="tableSizeGrid" aria-label="Elegir tamaño de tabla"></div>
+      <div class="table-size-inputs"><label>Filas <input id="tableRows" type="number" min="1" max="12" value="3"></label><label>Columnas <input id="tableColumns" type="number" min="1" max="12" value="3"></label></div>
+      <div class="modal-footer"><button class="secondary" type="button" id="cancelTableButton">Cancelar</button><button class="save" type="button" id="insertTableButton">Insertar tabla</button></div>
     </div>
   </dialog>
 
@@ -201,7 +211,7 @@
     function openMobileDetail(delay=0){clearTimeout(detailOpenTimer);const show=()=>{const c=selectedConcept(),content=$('#mobileDetailContent');if(!c)return;selectedId=c.id;content.innerHTML=detailMarkup(c);bindDetailActions(content,c);setOverlay('mobileDetailOverlay',true)};detailOpenTimer=delay?setTimeout(show,delay):show()}
     function observeTerms(){termsObserver?.disconnect();const root=$('#terms');if(!window.IntersectionObserver||!root)return;root.onscroll=()=>{ignoreTermObserver=false};termsObserver=new IntersectionObserver(entries=>{if(ignoreTermObserver)return;let hit=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(hit&&hit.target.dataset.id!==selectedId){selectedId=hit.target.dataset.id;renderPreview();root.querySelectorAll('.term').forEach(x=>x.classList.toggle('active',x.dataset.id===selectedId))}}, {root,rootMargin:'-18% 0px -62% 0px',threshold:[.05,.5]});root.querySelectorAll('.term').forEach(x=>termsObserver.observe(x))}
     function render(){ignoreTermObserver=true;renderFilters();renderList();renderPreview()}
-    let activeRichEditor=null,richSelection=null,formulaInsertRange=null,formulaTargetEditor=null,editingFormulaNode=null,selectedFormulaNode=null,copiedFormat=null,formulaClipboard=null,formulaPadMode='letters',formulaPadUppercase=false,formulaPadKeys=[];
+    let activeRichEditor=null,richSelection=null,formulaInsertRange=null,formulaTargetEditor=null,editingFormulaNode=null,selectedFormulaNode=null,selectedTableCell=null,copiedFormat=null,formulaClipboard=null,formulaPadMode='letters',formulaPadUppercase=false,formulaPadKeys=[];
     function rememberRichSelection(){const selection=window.getSelection();if(!selection?.rangeCount)return;const range=selection.getRangeAt(0),editor=range.commonAncestorContainer.nodeType===1?range.commonAncestorContainer:range.commonAncestorContainer.parentElement;const container=editor?.closest?.('.rich-editor');if(container){activeRichEditor=container;richSelection=range.cloneRange()}}
     function useRichCommand(command,value=null){const editor=activeRichEditor||$('#definitionInput');if(!editor)return;editor.focus();if(richSelection&&editor.contains(richSelection.commonAncestorContainer)){const selection=window.getSelection();selection.removeAllRanges();selection.addRange(richSelection)}document.execCommand(command,false,value);rememberRichSelection()}
     function selectionRangeInEditor(){const selection=window.getSelection();if(!selection?.rangeCount)return null;const range=selection.getRangeAt(0);return activeRichEditor?.contains(range.commonAncestorContainer)?range:null}
@@ -217,6 +227,13 @@
     function saveFavoriteSymbols(){favoriteSymbols=[...new Set(favoriteSymbols.filter(symbol=>symbol.trim()))].slice(0,24);localStorage.setItem(favoritesKey,JSON.stringify(favoriteSymbols));if(firebaseReady)queueCloudWrite()}
     function renderFavoriteSymbols(){document.querySelectorAll('.toolbar-symbols').forEach(group=>{group.querySelectorAll('[data-favorite-symbol]').forEach(button=>button.remove());const add=group.querySelector('.symbol-add');favoriteSymbols.forEach(symbol=>{const button=document.createElement('button');button.type='button';button.dataset.favoriteSymbol=symbol;button.title='Mantener pulsado para quitar';button.textContent=symbol;button.onmousedown=event=>{event.preventDefault();useRichCommand('insertText',symbol)};button.oncontextmenu=event=>{event.preventDefault();if(confirm(`¿Quitar ${symbol} de esta barra?`)){favoriteSymbols=favoriteSymbols.filter(item=>item!==symbol);saveFavoriteSymbols();renderFavoriteSymbols()}};group.insertBefore(button,add)})})}
     function mountToolbarExtras(){document.querySelectorAll('.editor-toolbar').forEach(toolbar=>{toolbar.querySelectorAll('[data-symbol]').forEach(button=>button.remove());const dividers=toolbar.querySelectorAll('.toolbar-divider');if(dividers[1])dividers[1].remove();const paletteBox=toolbar.querySelector('.color-palette');paletteBox.innerHTML=palette.map(([color,name])=>`<button type="button" class="color-swatch" data-color="${color}" style="background:${color}" title="${name}" aria-label="${name}"></button>`).join('');const group=document.createElement('span');group.className='toolbar-symbols';group.innerHTML='<button type="button" class="symbol-add" title="Agregar símbolo">＋</button><button type="button" data-cut-formula title="Cortar fórmula seleccionada">✂ƒ</button><button type="button" data-paste-formula title="Pegar fórmula">↪ƒ</button>';const formula=toolbar.querySelector('[data-formula]');formula.after(group);group.querySelector('.symbol-add').onclick=()=>{const values=prompt('Agregá símbolos separados por espacios.');if(!values)return;favoriteSymbols.push(...values.trim().split(/\s+/));saveFavoriteSymbols();renderFavoriteSymbols()}});renderFavoriteSymbols()}
+    function makeStudyTable(rows,columns){const table=document.createElement('table');table.className='study-table';const body=document.createElement('tbody');for(let row=0;row<rows;row++){const tr=document.createElement('tr');for(let column=0;column<columns;column++){const cell=document.createElement('td');cell.innerHTML='<br>';tr.append(cell)}body.append(tr)}table.append(body);return table}
+    function updateTableTools(){document.querySelectorAll('.table-tools').forEach(tools=>tools.hidden=!selectedTableCell?.isConnected)}
+    function selectTableCell(cell){selectedTableCell=cell;selectFormula(null);updateTableTools()}
+    function insertTable(){const rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3)),editor=activeRichEditor||$('#definitionInput'),table=makeStudyTable(rows,columns);editor.focus();const range=richSelection;if(range&&editor.contains(range.commonAncestorContainer)){range.deleteContents();range.insertNode(table);const after=document.createElement('p');after.innerHTML='<br>';table.after(after);const nextRange=document.createRange(),selection=window.getSelection();nextRange.setStart(after,0);nextRange.collapse(true);selection.removeAllRanges();selection.addRange(nextRange);richSelection=nextRange.cloneRange()}else editor.append(table,document.createElement('p'));$('#tableDialog').close();selectTableCell(table.querySelector('td'))}
+    function tableAction(action){const cell=selectedTableCell;if(!cell?.isConnected)return;const row=cell.closest('tr'),table=cell.closest('table');if(!row||!table)return;const column=[...row.cells].indexOf(cell);if(action==='add-row'){const newRow=document.createElement('tr');for(let i=0;i<row.cells.length;i++){const newCell=document.createElement('td');newCell.innerHTML='<br>';newRow.append(newCell)}row.after(newRow);selectTableCell(newRow.cells[column])}if(action==='remove-row'&&table.rows.length>1){const next=row.nextElementSibling||row.previousElementSibling;row.remove();selectTableCell(next.cells[Math.min(column,next.cells.length-1)])}if(action==='add-column'){[...table.rows].forEach(currentRow=>{const newCell=document.createElement('td');newCell.innerHTML='<br>';currentRow.insertBefore(newCell,currentRow.cells[column+1]||null)});selectTableCell(table.rows[row.rowIndex].cells[column+1])}if(action==='remove-column'&&row.cells.length>1){[...table.rows].forEach(currentRow=>currentRow.cells[column].remove());selectTableCell(table.rows[Math.min(row.rowIndex,table.rows.length-1)].cells[Math.min(column,table.rows[0].cells.length-1)])}if(action==='align-left')cell.style.textAlign='left';if(action==='align-center')cell.style.textAlign='center';if(action==='align-right')cell.style.textAlign='right';if(action==='align-top')cell.style.verticalAlign='top';if(action==='align-middle')cell.style.verticalAlign='middle';if(action==='align-bottom')cell.style.verticalAlign='bottom';if(action==='borders')table.classList.toggle('no-borders')}
+    function renderTableGrid(){const grid=$('#tableSizeGrid'),rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3));grid.innerHTML=Array.from({length:64},(_,index)=>{const row=Math.floor(index/8)+1,column=index%8+1;return `<button type="button" class="${row<=rows&&column<=columns?'selected':''}" data-table-size="${row},${column}" title="${row} × ${column}"></button>`}).join('');grid.querySelectorAll('[data-table-size]').forEach(button=>button.onclick=()=>{const [row,column]=button.dataset.tableSize.split(',');$('#tableRows').value=row;$('#tableColumns').value=column;renderTableGrid()})}
+    function mountTableTools(){document.querySelectorAll('.editor-toolbar').forEach(toolbar=>{const group=toolbar.querySelector('.toolbar-symbols');const insertButton=document.createElement('button');insertButton.type='button';insertButton.textContent='▦';insertButton.title='Insertar tabla';insertButton.onclick=()=>{renderTableGrid();$('#tableDialog').showModal()};group.prepend(insertButton);const tools=document.createElement('span');tools.className='table-tools';tools.hidden=true;tools.innerHTML='<button type="button" data-table-action="add-row" title="Agregar fila">＋F</button><button type="button" data-table-action="remove-row" title="Quitar fila">−F</button><button type="button" data-table-action="add-column" title="Agregar columna">＋C</button><button type="button" data-table-action="remove-column" title="Quitar columna">−C</button><button type="button" data-table-action="borders" title="Mostrar u ocultar bordes">▦</button><button type="button" data-table-action="align-left" title="Alinear a la izquierda">≡</button><button type="button" data-table-action="align-center" title="Centrar">≣</button><button type="button" data-table-action="align-right" title="Alinear a la derecha">☰</button><button type="button" data-table-action="align-top" title="Alinear arriba">↥</button><button type="button" data-table-action="align-middle" title="Centrar verticalmente">↕</button><button type="button" data-table-action="align-bottom" title="Alinear abajo">↧</button>';group.after(tools);tools.querySelectorAll('[data-table-action]').forEach(button=>button.onclick=()=>tableAction(button.dataset.tableAction))});$('#closeTableDialog').onclick=()=>$('#tableDialog').close();$('#cancelTableButton').onclick=()=>$('#tableDialog').close();$('#insertTableButton').onclick=insertTable;$('#tableRows').oninput=renderTableGrid;$('#tableColumns').oninput=renderTableGrid}
     function makeFormulaNode(latex){const node=document.createElement('math-span');node.className='formula-inline';node.dataset.latex=latex;node.setAttribute('contenteditable','false');node.setAttribute('title','Doble clic para editar la fórmula');node.textContent=latex;return node}
     function clearFormulaState(){formulaInsertRange=null;formulaTargetEditor=null;editingFormulaNode=null;window.mathVirtualKeyboard?.hide()}
     function formulaKey(label,insert=null,extra={}){return{label,insert,...extra}}
@@ -267,7 +284,7 @@
     }
     function sanitizeRichHtml(value){
       const doc=new DOMParser().parseFromString(String(value||''),'text/html');
-      const allowed=new Set(['B','STRONG','I','EM','U','BR','DIV','P','SPAN','FONT','A','MATH-FIELD']);
+      const allowed=new Set(['B','STRONG','I','EM','U','BR','DIV','P','SPAN','FONT','A','MATH-FIELD','TABLE','THEAD','TBODY','TR','TD','TH']);
       function clean(node){
         [...node.childNodes].forEach(clean);
         if(node.nodeType!==1)return;
@@ -283,10 +300,17 @@
         const isFormula=tag==='MATH-FIELD'&&node.classList.contains('formula-inline');
         const isConceptLink=tag==='A'&&node.classList.contains('concept-link')&&/^concept:[\w-]+$/.test(node.getAttribute('href')||'');
         const suppressLink=tag==='SPAN'&&node.classList.contains('link-suppressed');
+        const isTable=tag==='TABLE';
+        const tableWithoutBorders=isTable&&node.classList.contains('no-borders');
+        const isTableCell=tag==='TD'||tag==='TH';
         const latex=isFormula?safeLatex(node.getAttribute('data-latex')||node.textContent):'';
         const source=isFormula?safeLatex(node.getAttribute('data-formula-source')||latex):'';
         const formulaSize=isFormula?node.getAttribute('data-formula-size')||'3':'3';
         const color=tag==='FONT'?node.getAttribute('color'):node.style.color;
+        // execCommand('fontSize') creates <font size="…"> in Chrome. Keep it
+        // when saving, otherwise the size only appears to work in the editor.
+        const fontSize=tag==='FONT'?node.getAttribute('size'):'';
+        const styledFontSize=tag==='FONT'?'':node.style.fontSize;
         if(isFormula){
           if(latex)node.replaceWith(formulaElement(doc,latex,source,formulaSize));else node.remove();
           return;
@@ -302,8 +326,17 @@
           node.setAttribute('class','link-suppressed');
           return;
         }
+        if(isTable||isTableCell){
+          const textAlign=node.style.textAlign,verticalAlign=node.style.verticalAlign,backgroundColor=node.style.backgroundColor,fontSize=node.style.fontSize;
+          [...node.attributes].forEach(a=>node.removeAttribute(a.name));
+          if(isTable)node.setAttribute('class',`study-table${tableWithoutBorders?' no-borders':''}`);
+          if(isTableCell){if(textAlign)node.style.textAlign=textAlign;if(verticalAlign)node.style.verticalAlign=verticalAlign;if(backgroundColor)node.style.backgroundColor=backgroundColor;if(fontSize)node.style.fontSize=fontSize}
+          return;
+        }
         [...node.attributes].forEach(a=>node.removeAttribute(a.name));
         if(color){if(tag==='FONT')node.setAttribute('color',color);else node.style.color=color}
+        if(tag==='FONT'&&/^[1-7]$/.test(fontSize))node.setAttribute('size',fontSize);
+        if(tag!=='FONT'&&/^\d+(?:\.\d+)?(?:px|em|rem|%)$/.test(styledFontSize||''))node.style.fontSize=styledFontSize;
       }
       [...doc.body.childNodes].forEach(clean);
       return doc.body.innerHTML;
@@ -471,6 +504,7 @@
     }
     function setupRichEditors(){
       mountToolbarExtras();
+      mountTableTools();
       document.addEventListener('selectionchange',rememberRichSelection);
       document.querySelectorAll('.rich-editor').forEach(editor=>{
         editor.addEventListener('focus',()=>activeRichEditor=editor);
@@ -484,7 +518,8 @@
         });
         editor.addEventListener('pointerup',()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}});
         editor.addEventListener('pointercancel',()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}});
-        editor.addEventListener('click',event=>{const link=event.target.closest?.('a.concept-link');if(link){event.preventDefault();openLinkedConcept(link.dataset.conceptId)}});
+        editor.addEventListener('click',event=>{const link=event.target.closest?.('a.concept-link');if(link){event.preventDefault();openLinkedConcept(link.dataset.conceptId);return}const cell=event.target.closest?.('td,th');if(cell?.closest('.study-table'))selectTableCell(cell)});
+        editor.addEventListener('focusin',event=>{const cell=event.target.closest?.('td,th');if(cell?.closest('.study-table'))selectTableCell(cell)});
         editor.addEventListener('dblclick',event=>{
           const node=event.target.closest?.('math-field.formula-inline');
           if(!node)return;
@@ -496,7 +531,13 @@
       document.querySelectorAll('[data-color]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();useRichCommand('foreColor',button.dataset.color)}));
       document.querySelectorAll('[data-copy-format]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();copyFormat()}));
       document.querySelectorAll('[data-apply-format]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();applyCopiedFormat()}));
-      document.querySelectorAll('[data-font-size]').forEach(select=>select.addEventListener('change',()=>applyFontSize(select.value)));
+      document.querySelectorAll('[data-font-size]').forEach(select=>{
+        // A native <select> takes focus before "change". Save the text range
+        // at pointer-down so applying Chico/Grande still targets the selection.
+        select.addEventListener('pointerdown',rememberRichSelection);
+        select.addEventListener('mousedown',rememberRichSelection);
+        select.addEventListener('change',()=>applyFontSize(select.value));
+      });
       document.querySelectorAll('[data-create-link]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();createManualLink(button.closest('.link-picker').querySelector('[data-link-target]'))}));
       document.querySelectorAll('[data-remove-link]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();removeManualLink()}));
       document.querySelectorAll('[data-cut-formula]').forEach(button=>button.addEventListener('click',cutFormula));
@@ -522,7 +563,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=11', { updateViaCache: 'none' });
+        navigator.serviceWorker.register('./sw.js?v=13', { updateViaCache: 'none' });
       });
     }
   </script>
