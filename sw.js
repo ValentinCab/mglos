@@ -29,7 +29,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  // La página se busca primero online: el link normal no queda viejo.
+  // El HTML se busca primero en línea para que el enlace normal siempre traiga la versión nueva.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -39,9 +39,7 @@ self.addEventListener('fetch', event => {
           return response;
         })
         .catch(() =>
-          caches.match(event.request).then(
-            cached => cached || caches.match('./index.html')
-          )
+          caches.match(event.request).then(cached => cached || caches.match('./index.html'))
         )
     );
     return;
@@ -54,9 +52,8 @@ self.addEventListener('fetch', event => {
       return fetch(event.request).then(response => {
         const url = new URL(event.request.url);
         if (url.origin === self.location.origin) {
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, response.clone());
-          });
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
         return response;
       });
