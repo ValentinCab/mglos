@@ -29,6 +29,8 @@
     .formula-pad{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:12px}.formula-pad button{min-height:35px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--tag);color:var(--ink);font-weight:650;font-size:.86rem}.formula-pad button:hover,.formula-pad button:active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.formula-pad .pad-mode{font-size:.72rem;background:transparent}.formula-pad .span2{grid-column:span 2}
     #formulaDialog[open].formula-layer{position:fixed;inset:0;z-index:20;display:block;max-width:none;width:100%;margin:0;padding:12px;border:0;border-radius:0;background:rgba(31,33,28,.43);overflow:auto}
     #formulaDialog[open].formula-layer .formula-modal{width:min(660px,100%);margin:clamp(12px,7vh,72px) auto 36px;border-radius:16px;background:var(--paper);box-shadow:0 24px 80px rgba(0,0,0,.25)}
+    #tableDialog[open].table-layer{position:fixed;inset:0;z-index:30;display:block;max-width:none;width:100%;margin:0;padding:12px;border:0;border-radius:0;background:rgba(31,33,28,.43);overflow:auto}
+    #tableDialog[open].table-layer .table-modal{width:min(520px,100%);margin:clamp(12px,12vh,110px) auto 36px;border-radius:16px;background:var(--paper);box-shadow:0 24px 80px rgba(0,0,0,.25)}
     @media(max-width:760px){#formulaDialog[open].formula-layer{padding:12px}#formulaDialog[open].formula-layer .formula-modal{margin:8px auto 36px;padding:20px}.formula-pad button{min-height:37px;font-size:.8rem}}@media(min-width:761px){.formula-pad{display:none}}
     /* Fórmulas: la escritura se hace con el teclado nativo del dispositivo. */
     .formula-inline{min-width:0;border:0;pointer-events:auto}
@@ -42,7 +44,11 @@
     .editor-toolbar button.painter-active{background:var(--accent);color:#fff}.editor-toolbar select{height:28px;max-width:94px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:.75rem}
     .concept-link{color:#1f5f42!important;font-weight:750;text-decoration:underline;cursor:pointer}.concept-link:hover{color:var(--accent)!important}
     .link-picker{display:flex;gap:4px;align-items:center;min-width:165px}.link-picker select{flex:1}.tag-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.tag-suggestions button{border:1px solid var(--line);background:var(--tag);color:var(--ink);border-radius:999px;padding:4px 8px;font-size:.75rem}.tag-suggestions button.selected{color:var(--accent);border-color:var(--accent)}
-    .formula-inline.formula-selected{outline:2px solid var(--accent)}.formula-inline[data-formula-size="2"]{font-size:.82em}.formula-inline[data-formula-size="3"]{font-size:1em}.formula-inline[data-formula-size="4"]{font-size:1.25em}.formula-inline[data-formula-size="5"]{font-size:1.5em}.filter-label{width:100%;margin-top:4px;color:var(--muted);font-size:.72rem;font-weight:750;text-transform:uppercase;letter-spacing:.06em}.subject-chip{font-weight:750}.toolbar-symbols{display:flex;align-items:center;gap:2px}.editor-toolbar .toolbar-symbols button{min-width:25px;font-size:.94rem}.editor-toolbar .symbol-add{font-size:1rem;font-weight:650;color:var(--accent)}.table-tools{display:flex;align-items:center;gap:2px}.editor-toolbar .table-tools button{min-width:25px;font-size:.78rem}.study-table{border-collapse:collapse;table-layout:fixed;max-width:100%;margin:13px 0;display:table}.study-table td,.study-table th{min-width:76px;border:1px solid #6d736d;padding:7px 8px;vertical-align:middle;text-align:left}.study-table.no-borders td,.study-table.no-borders th{border:0}.study-table td:focus,.study-table th:focus{outline:2px solid var(--accent);outline-offset:-2px}.table-size-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:12px 0}.table-size-grid button{aspect-ratio:1;border:1px solid var(--line);border-radius:4px;background:var(--input)}.table-size-grid button.selected{background:var(--accent);border-color:var(--accent)}.table-size-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}.table-size-inputs label{margin:0}.table-size-inputs input{margin-top:5px}.rich-editor{overflow-x:auto}@media(max-width:760px){.study-table td,.study-table th{min-width:68px;padding:6px}.table-size-grid{grid-template-columns:repeat(6,1fr)}}
+    .formula-inline.formula-selected{outline:2px solid var(--accent)}.formula-inline[data-formula-size="2"]{font-size:.82em}.formula-inline[data-formula-size="3"]{font-size:1em}.formula-inline[data-formula-size="4"]{font-size:1.25em}.formula-inline[data-formula-size="5"]{font-size:1.5em}.filter-label{width:100%;margin-top:4px;color:var(--muted);font-size:.72rem;font-weight:750;text-transform:uppercase;letter-spacing:.06em}.subject-chip{font-weight:750}.toolbar-symbols{display:flex;align-items:center;gap:2px}.editor-toolbar .toolbar-symbols button{min-width:25px;font-size:.94rem}.editor-toolbar .symbol-add{font-size:1rem;font-weight:650;color:var(--accent)}.table-tools{display:flex;align-items:center;gap:2px}.editor-toolbar .table-tools button{min-width:25px;font-size:.78rem}.study-table{border-collapse:collapse;table-layout:fixed;max-width:100%;margin:13px 0;display:table}.study-table td,.study-table th{min-width:76px;border:1px solid #6d736d;padding:7px 8px;vertical-align:middle;text-align:left}.study-table.no-borders td,.study-table.no-borders th{border:0}.study-table td:focus,.study-table th:focus,.study-table td.table-cell-selected,.study-table th.table-cell-selected{outline:2px solid var(--accent);outline-offset:-2px;background:color-mix(in srgb,var(--accent) 12%,transparent)}.table-size-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:12px 0}.table-size-grid button{aspect-ratio:1;border:1px solid var(--line);border-radius:4px;background:var(--input)}.table-size-grid button.selected{background:var(--accent);border-color:var(--accent)}.table-size-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}.table-size-inputs label{margin:0}.table-size-inputs input{margin-top:5px}.rich-editor{overflow-x:auto}@media(max-width:760px){.study-table td,.study-table th{min-width:68px;padding:6px}.table-size-grid{grid-template-columns:repeat(6,1fr)}}
+    .study-table td,.study-table th{position:relative}.study-table td.table-cell-selected,.study-table th.table-cell-selected{background:transparent}
+    .table-size-grid{grid-template-columns:repeat(6,1fr);gap:4px;margin:9px 0}.table-size-grid button{aspect-ratio:auto;height:36px}
+    .editor-toolbar .table-tools button.table-align{display:grid;place-items:center}.align-lines{display:grid;gap:2px;width:14px}.align-lines i{display:block;height:1.5px;background:currentColor;border-radius:2px}.align-lines i:nth-child(2),.align-lines i:nth-child(4){width:68%}.align-left i:nth-child(2),.align-left i:nth-child(4){margin-right:auto}.align-center i:nth-child(2),.align-center i:nth-child(4){margin-inline:auto}.align-right i:nth-child(2),.align-right i:nth-child(4){margin-left:auto}
+    .editor-toolbar .table-fill{width:24px;height:24px;padding:1px;border:1px solid var(--line);border-radius:5px;background:var(--paper)}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
@@ -204,14 +210,18 @@
     function selectedConcept(){return concepts.find(x=>x.id===selectedId)||shown()[0]}
     function detailMarkup(c){const images=(c.images||[]).map(src=>`<img src="${src}" alt="Apunte visual de ${esc(c.term)}">`).join(''),subject=subjectOf(c),tags=displayTags(c).filter(t=>t!==subject);return `<div class="preview-top"><h2>${esc(c.term)}</h2><button class="edit" data-edit-detail>Editar</button></div><div class="preview-body"><div class="tag-list">${subject?`<button class="tag subject-tag" data-preview-tag="${esc(subject)}">${esc(subject)}</button>`:''}${tags.map(t=>`<button class="tag" data-preview-tag="${esc(t)}">#${esc(t)}</button>`).join('')}</div><div class="definition">${richHtml(c.definition)}</div>${plainRich(c.notes).trim()?`<div class="detail">${richHtml(c.notes)}</div>`:''}${images?`<div class="gallery">${images}</div>`:''}</div>`}
     function openLinkedConcept(id){const target=concepts.find(c=>c.id===id);if(!target)return;selectedId=id;render();if(isCompact())openMobileDetail()}
-    function bindDetailActions(container,c){container.querySelector('[data-edit-detail]').onclick=()=>{closeMobileDetail();openEditor(c.id)};container.querySelectorAll('[data-preview-tag]').forEach(b=>b.onclick=()=>{activeTags.add(b.dataset.previewTag);closeMobileDetail();render()});container.querySelectorAll('.concept-link').forEach(link=>link.onclick=event=>{event.preventDefault();event.stopPropagation();openLinkedConcept(link.dataset.conceptId)})}
+    function bindDetailActions(container,c){
+      container.querySelector('[data-edit-detail]').onclick=()=>{closeMobileDetail();openEditor(c.id)};
+      container.querySelectorAll('[data-preview-tag]').forEach(b=>b.onclick=()=>{activeTags.add(b.dataset.previewTag);closeMobileDetail();render()});
+      container.querySelectorAll('.concept-link').forEach(link=>link.onclick=event=>{event.preventDefault();event.stopPropagation();openLinkedConcept(link.dataset.conceptId)});
+    }
     function renderPreview(){let c=selectedConcept(),preview=$('#preview');if(!c){preview.innerHTML='<div class="preview-body"><p class="empty">Elegí o agregá un concepto para ver su ficha.</p></div>';return}selectedId=c.id;preview.innerHTML=detailMarkup(c);preview.scrollTop=0;bindDetailActions(preview,c)}
     function updateMobileFocus(){if(!isCompact())return;const terms=[...document.querySelectorAll('#terms .term')];if(!terms.length)return;const middle=window.innerHeight*.52;let closest=terms.reduce((best,term)=>Math.abs((term.getBoundingClientRect().top+term.getBoundingClientRect().bottom)/2-middle)<best.distance?{term,distance:Math.abs((term.getBoundingClientRect().top+term.getBoundingClientRect().bottom)/2-middle)}:best,{term:null,distance:Infinity}).term;if(!closest)return;mobileFocusId=closest.dataset.id;terms.forEach(term=>term.classList.toggle('focused',term===closest))}
     function closeMobileDetail(){clearTimeout(detailOpenTimer);setOverlay('mobileDetailOverlay',false);if(isCompact()){mobileListHighlight=false;document.querySelectorAll('#terms .term').forEach(term=>term.classList.remove('active'));requestAnimationFrame(updateMobileFocus)}}
     function openMobileDetail(delay=0){clearTimeout(detailOpenTimer);const show=()=>{const c=selectedConcept(),content=$('#mobileDetailContent');if(!c)return;selectedId=c.id;content.innerHTML=detailMarkup(c);bindDetailActions(content,c);setOverlay('mobileDetailOverlay',true)};detailOpenTimer=delay?setTimeout(show,delay):show()}
     function observeTerms(){termsObserver?.disconnect();const root=$('#terms');if(!window.IntersectionObserver||!root)return;root.onscroll=()=>{ignoreTermObserver=false};termsObserver=new IntersectionObserver(entries=>{if(ignoreTermObserver)return;let hit=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(hit&&hit.target.dataset.id!==selectedId){selectedId=hit.target.dataset.id;renderPreview();root.querySelectorAll('.term').forEach(x=>x.classList.toggle('active',x.dataset.id===selectedId))}}, {root,rootMargin:'-18% 0px -62% 0px',threshold:[.05,.5]});root.querySelectorAll('.term').forEach(x=>termsObserver.observe(x))}
     function render(){ignoreTermObserver=true;renderFilters();renderList();renderPreview()}
-    let activeRichEditor=null,richSelection=null,formulaInsertRange=null,formulaTargetEditor=null,editingFormulaNode=null,selectedFormulaNode=null,selectedTableCell=null,copiedFormat=null,formulaClipboard=null,formulaPadMode='letters',formulaPadUppercase=false,formulaPadKeys=[];
+    let activeRichEditor=null,richSelection=null,formulaInsertRange=null,formulaTargetEditor=null,editingFormulaNode=null,selectedFormulaNode=null,selectedTableCell=null,tableSelectionAnchor=null,selectedTableCells=[],tableResizeState=null,copiedFormat=null,formulaClipboard=null,formulaPadMode='letters',formulaPadUppercase=false,formulaPadKeys=[];
     function rememberRichSelection(){const selection=window.getSelection();if(!selection?.rangeCount)return;const range=selection.getRangeAt(0),editor=range.commonAncestorContainer.nodeType===1?range.commonAncestorContainer:range.commonAncestorContainer.parentElement;const container=editor?.closest?.('.rich-editor');if(container){activeRichEditor=container;richSelection=range.cloneRange()}}
     function useRichCommand(command,value=null){const editor=activeRichEditor||$('#definitionInput');if(!editor)return;editor.focus();if(richSelection&&editor.contains(richSelection.commonAncestorContainer)){const selection=window.getSelection();selection.removeAllRanges();selection.addRange(richSelection)}document.execCommand(command,false,value);rememberRichSelection()}
     function selectionRangeInEditor(){const selection=window.getSelection();if(!selection?.rangeCount)return null;const range=selection.getRangeAt(0);return activeRichEditor?.contains(range.commonAncestorContainer)?range:null}
@@ -228,12 +238,113 @@
     function renderFavoriteSymbols(){document.querySelectorAll('.toolbar-symbols').forEach(group=>{group.querySelectorAll('[data-favorite-symbol]').forEach(button=>button.remove());const add=group.querySelector('.symbol-add');favoriteSymbols.forEach(symbol=>{const button=document.createElement('button');button.type='button';button.dataset.favoriteSymbol=symbol;button.title='Mantener pulsado para quitar';button.textContent=symbol;button.onmousedown=event=>{event.preventDefault();useRichCommand('insertText',symbol)};button.oncontextmenu=event=>{event.preventDefault();if(confirm(`¿Quitar ${symbol} de esta barra?`)){favoriteSymbols=favoriteSymbols.filter(item=>item!==symbol);saveFavoriteSymbols();renderFavoriteSymbols()}};group.insertBefore(button,add)})})}
     function mountToolbarExtras(){document.querySelectorAll('.editor-toolbar').forEach(toolbar=>{toolbar.querySelectorAll('[data-symbol]').forEach(button=>button.remove());const dividers=toolbar.querySelectorAll('.toolbar-divider');if(dividers[1])dividers[1].remove();const paletteBox=toolbar.querySelector('.color-palette');paletteBox.innerHTML=palette.map(([color,name])=>`<button type="button" class="color-swatch" data-color="${color}" style="background:${color}" title="${name}" aria-label="${name}"></button>`).join('');const group=document.createElement('span');group.className='toolbar-symbols';group.innerHTML='<button type="button" class="symbol-add" title="Agregar símbolo">＋</button><button type="button" data-cut-formula title="Cortar fórmula seleccionada">✂ƒ</button><button type="button" data-paste-formula title="Pegar fórmula">↪ƒ</button>';const formula=toolbar.querySelector('[data-formula]');formula.after(group);group.querySelector('.symbol-add').onclick=()=>{const values=prompt('Agregá símbolos separados por espacios.');if(!values)return;favoriteSymbols.push(...values.trim().split(/\s+/));saveFavoriteSymbols();renderFavoriteSymbols()}});renderFavoriteSymbols()}
     function makeStudyTable(rows,columns){const table=document.createElement('table');table.className='study-table';const body=document.createElement('tbody');for(let row=0;row<rows;row++){const tr=document.createElement('tr');for(let column=0;column<columns;column++){const cell=document.createElement('td');cell.innerHTML='<br>';tr.append(cell)}body.append(tr)}table.append(body);return table}
-    function updateTableTools(){document.querySelectorAll('.table-tools').forEach(tools=>tools.hidden=!selectedTableCell?.isConnected)}
-    function selectTableCell(cell){selectedTableCell=cell;selectFormula(null);updateTableTools()}
-    function insertTable(){const rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3)),editor=activeRichEditor||$('#definitionInput'),table=makeStudyTable(rows,columns);editor.focus();const range=richSelection;if(range&&editor.contains(range.commonAncestorContainer)){range.deleteContents();range.insertNode(table);const after=document.createElement('p');after.innerHTML='<br>';table.after(after);const nextRange=document.createRange(),selection=window.getSelection();nextRange.setStart(after,0);nextRange.collapse(true);selection.removeAllRanges();selection.addRange(nextRange);richSelection=nextRange.cloneRange()}else editor.append(table,document.createElement('p'));$('#tableDialog').close();selectTableCell(table.querySelector('td'))}
-    function tableAction(action){const cell=selectedTableCell;if(!cell?.isConnected)return;const row=cell.closest('tr'),table=cell.closest('table');if(!row||!table)return;const column=[...row.cells].indexOf(cell);if(action==='add-row'){const newRow=document.createElement('tr');for(let i=0;i<row.cells.length;i++){const newCell=document.createElement('td');newCell.innerHTML='<br>';newRow.append(newCell)}row.after(newRow);selectTableCell(newRow.cells[column])}if(action==='remove-row'&&table.rows.length>1){const next=row.nextElementSibling||row.previousElementSibling;row.remove();selectTableCell(next.cells[Math.min(column,next.cells.length-1)])}if(action==='add-column'){[...table.rows].forEach(currentRow=>{const newCell=document.createElement('td');newCell.innerHTML='<br>';currentRow.insertBefore(newCell,currentRow.cells[column+1]||null)});selectTableCell(table.rows[row.rowIndex].cells[column+1])}if(action==='remove-column'&&row.cells.length>1){[...table.rows].forEach(currentRow=>currentRow.cells[column].remove());selectTableCell(table.rows[Math.min(row.rowIndex,table.rows.length-1)].cells[Math.min(column,table.rows[0].cells.length-1)])}if(action==='align-left')cell.style.textAlign='left';if(action==='align-center')cell.style.textAlign='center';if(action==='align-right')cell.style.textAlign='right';if(action==='align-top')cell.style.verticalAlign='top';if(action==='align-middle')cell.style.verticalAlign='middle';if(action==='align-bottom')cell.style.verticalAlign='bottom';if(action==='borders')table.classList.toggle('no-borders')}
-    function renderTableGrid(){const grid=$('#tableSizeGrid'),rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3));grid.innerHTML=Array.from({length:64},(_,index)=>{const row=Math.floor(index/8)+1,column=index%8+1;return `<button type="button" class="${row<=rows&&column<=columns?'selected':''}" data-table-size="${row},${column}" title="${row} × ${column}"></button>`}).join('');grid.querySelectorAll('[data-table-size]').forEach(button=>button.onclick=()=>{const [row,column]=button.dataset.tableSize.split(',');$('#tableRows').value=row;$('#tableColumns').value=column;renderTableGrid()})}
-    function mountTableTools(){document.querySelectorAll('.editor-toolbar').forEach(toolbar=>{const group=toolbar.querySelector('.toolbar-symbols');const insertButton=document.createElement('button');insertButton.type='button';insertButton.textContent='▦';insertButton.title='Insertar tabla';insertButton.onclick=()=>{renderTableGrid();$('#tableDialog').showModal()};group.prepend(insertButton);const tools=document.createElement('span');tools.className='table-tools';tools.hidden=true;tools.innerHTML='<button type="button" data-table-action="add-row" title="Agregar fila">＋F</button><button type="button" data-table-action="remove-row" title="Quitar fila">−F</button><button type="button" data-table-action="add-column" title="Agregar columna">＋C</button><button type="button" data-table-action="remove-column" title="Quitar columna">−C</button><button type="button" data-table-action="borders" title="Mostrar u ocultar bordes">▦</button><button type="button" data-table-action="align-left" title="Alinear a la izquierda">≡</button><button type="button" data-table-action="align-center" title="Centrar">≣</button><button type="button" data-table-action="align-right" title="Alinear a la derecha">☰</button><button type="button" data-table-action="align-top" title="Alinear arriba">↥</button><button type="button" data-table-action="align-middle" title="Centrar verticalmente">↕</button><button type="button" data-table-action="align-bottom" title="Alinear abajo">↧</button>';group.after(tools);tools.querySelectorAll('[data-table-action]').forEach(button=>button.onclick=()=>tableAction(button.dataset.tableAction))});$('#closeTableDialog').onclick=()=>$('#tableDialog').close();$('#cancelTableButton').onclick=()=>$('#tableDialog').close();$('#insertTableButton').onclick=insertTable;$('#tableRows').oninput=renderTableGrid;$('#tableColumns').oninput=renderTableGrid}
+    function updateTableTools(){document.querySelectorAll('.table-tools').forEach(tools=>{tools.hidden=!selectedTableCell?.isConnected;const fill=tools.querySelector('[data-table-fill]');if(fill&&selectedTableCell){const color=selectedTableCell.style.backgroundColor;if(/^#[0-9a-f]{6}$/i.test(color))fill.value=color}})}
+    function tableCellRectangle(start,end){
+      const table=start?.closest('.study-table');if(!table||table!==end?.closest('.study-table'))return [];
+      const grid=buildTableGrid(table),startPosition=tableCellPosition(grid,start),endPosition=tableCellPosition(grid,end);if(!startPosition||!endPosition)return [];
+      const firstRow=Math.min(startPosition.row,endPosition.row),lastRow=Math.max(startPosition.row+start.rowSpan-1,endPosition.row+end.rowSpan-1),firstColumn=Math.min(startPosition.column,endPosition.column),lastColumn=Math.max(startPosition.column+start.colSpan-1,endPosition.column+end.colSpan-1),cells=[];
+      for(let row=firstRow;row<=lastRow;row++)for(let column=firstColumn;column<=lastColumn;column++){const cell=grid[row]?.[column];if(!cell)return [];if(!cells.includes(cell))cells.push(cell)}
+      return cells;
+    }
+    function selectTableCell(cell,extend=false){
+      document.querySelectorAll('.study-table .table-cell-selected').forEach(item=>item.classList.remove('table-cell-selected'));
+      if(!cell){selectedTableCell=null;tableSelectionAnchor=null;selectedTableCells=[];selectFormula(null);updateTableTools();return}
+      selectedTableCell=cell;
+      if(extend&&tableSelectionAnchor?.isConnected){const cells=tableCellRectangle(tableSelectionAnchor,cell);selectedTableCells=cells.length?cells:[cell]}else{tableSelectionAnchor=cell;selectedTableCells=[cell]}
+      selectedTableCells.forEach(item=>item.classList.add('table-cell-selected'));selectFormula(null);updateTableTools();
+    }
+    function tableHasMergedCells(table){return [...table.querySelectorAll('td,th')].some(cell=>cell.colSpan>1||cell.rowSpan>1)}
+    function buildTableGrid(table){
+      const grid=[];
+      [...table.rows].forEach((row,rowIndex)=>{grid[rowIndex]||=[];let column=0;[...row.cells].forEach(cell=>{while(grid[rowIndex][column])column++;for(let r=rowIndex;r<rowIndex+cell.rowSpan;r++){grid[r]||=[];for(let c=column;c<column+cell.colSpan;c++)grid[r][c]=cell}column+=cell.colSpan})});
+      return grid;
+    }
+    function tableCellPosition(grid,cell){for(let row=0;row<grid.length;row++)for(let column=0;column<grid[row].length;column++)if(grid[row][column]===cell&&(row===0||grid[row-1]?.[column]!==cell)&&(column===0||grid[row][column-1]!==cell))return {row,column};return null}
+    function addTableRow(table,cell){
+      const grid=buildTableGrid(table),position=tableCellPosition(grid,cell);if(!position)return;
+      const insertAt=Math.min(table.rows.length,position.row+cell.rowSpan),newRow=document.createElement('tr'),width=Math.max(...grid.map(row=>row.length)),expanded=new Set();
+      for(let column=0;column<width;column++){
+        const above=grid[insertAt-1]?.[column],abovePosition=above&&tableCellPosition(grid,above);
+        if(above&&abovePosition&&abovePosition.row+above.rowSpan>insertAt){if(!expanded.has(above)){above.rowSpan+=1;expanded.add(above)};continue}
+        const newCell=document.createElement('td');newCell.innerHTML='<br>';newRow.append(newCell);
+      }
+      if(insertAt>=table.rows.length)table.append(newRow);else table.rows[insertAt].before(newRow);
+      selectTableCell(newRow.cells[0]||cell);
+    }
+    function addTableColumn(table,cell){
+      const grid=buildTableGrid(table),position=tableCellPosition(grid,cell);if(!position)return;
+      const insertAt=position.column+cell.colSpan,expanded=new Set();let selected=null;
+      [...table.rows].forEach((row,rowIndex)=>{
+        const left=grid[rowIndex]?.[insertAt-1],leftPosition=left&&tableCellPosition(grid,left);
+        if(left&&leftPosition&&leftPosition.column+left.colSpan>insertAt){if(!expanded.has(left)){left.colSpan+=1;expanded.add(left)};return}
+        const newCell=document.createElement('td');newCell.innerHTML='<br>';
+        const before=[...row.cells].find(current=>{const currentPosition=tableCellPosition(grid,current);return currentPosition&&currentPosition.column>=insertAt});
+        row.insertBefore(newCell,before||null);if(rowIndex===position.row)selected=newCell;
+      });
+      selectTableCell(selected||cell);
+    }
+    function mergeSelectedTableCells(){
+      const cells=selectedTableCells.filter(cell=>cell.isConnected),table=cells[0]?.closest('.study-table');
+      if(cells.length<2||!table||cells.some(cell=>cell.closest('.study-table')!==table))return;
+      const grid=buildTableGrid(table),positions=cells.map(cell=>tableCellPosition(grid,cell));if(positions.some(position=>!position))return;
+      const firstRow=Math.min(...positions.map(position=>position.row)),lastRow=Math.max(...positions.map((position,index)=>position.row+cells[index].rowSpan-1)),firstColumn=Math.min(...positions.map(position=>position.column)),lastColumn=Math.max(...positions.map((position,index)=>position.column+cells[index].colSpan-1));
+      const block=[];for(let row=firstRow;row<=lastRow;row++)for(let column=firstColumn;column<=lastColumn;column++){const current=grid[row]?.[column];if(!current)return;if(!block.includes(current))block.push(current)}
+      const anchor=grid[firstRow][firstColumn];if(!anchor)return;anchor.colSpan=lastColumn-firstColumn+1;anchor.rowSpan=lastRow-firstRow+1;
+      block.filter(cell=>cell!==anchor).forEach(cell=>cell.remove());selectTableCell(null);
+    }
+    function unmergeSelectedTableCell(){
+      const cell=selectedTableCell,table=cell?.closest('.study-table');if(!cell||!table||(cell.colSpan===1&&cell.rowSpan===1))return;
+      const grid=buildTableGrid(table),position=tableCellPosition(grid,cell);if(!position)return;
+      const rows=cell.rowSpan,columns=cell.colSpan;cell.rowSpan=1;cell.colSpan=1;
+      for(let rowIndex=position.row;rowIndex<position.row+rows;rowIndex++){
+        const row=table.rows[rowIndex];
+        for(let columnIndex=position.column;columnIndex<position.column+columns;columnIndex++){
+          if(rowIndex===position.row&&columnIndex===position.column)continue;
+          const newCell=document.createElement('td');newCell.innerHTML='<br>';
+          const before=[...row.cells].find(current=>{const currentPosition=tableCellPosition(grid,current);return currentPosition&&currentPosition.column>columnIndex});
+          row.insertBefore(newCell,before||null);
+        }
+      }
+      selectTableCell(null);
+    }
+    function tableResizeTarget(event){
+      const cell=event.target.closest?.('td,th');if(!cell?.closest('.study-table'))return null;
+      const rect=cell.getBoundingClientRect(),right=rect.right-event.clientX,bottom=rect.bottom-event.clientY,threshold=18;
+      if(right<0||bottom<0)return null;
+      if(right<=threshold&&right<=bottom)return {axis:'column',cell};
+      if(bottom<=threshold)return {axis:'row',cell};
+      return null;
+    }
+    function startTableResize(event,target){
+      const cell=target.cell,table=cell.closest('.study-table'),row=cell.closest('tr'),column=[...row.cells].indexOf(cell);
+      event.preventDefault();event.stopPropagation();
+      tableResizeState={axis:target.axis,table,row,column,cell,merged:tableHasMergedCells(table),startX:event.clientX,startY:event.clientY,startSize:target.axis==='column'?cell.getBoundingClientRect().width:row.getBoundingClientRect().height};
+      document.body.style.userSelect='none';window.addEventListener('pointermove',resizeTable);window.addEventListener('pointerup',finishTableResize,{once:true});window.addEventListener('pointercancel',finishTableResize,{once:true});
+    }
+    function resizeTable(event){
+      const state=tableResizeState;if(!state)return;
+      const size=Math.max(state.axis==='column'?48:30,Math.round(state.startSize+(state.axis==='column'?event.clientX-state.startX:event.clientY-state.startY)));
+      if(state.axis==='column'){
+        if(state.merged)state.cell.style.width=`${size}px`;
+        else [...state.table.rows].forEach(row=>{const cell=row.cells[state.column];if(cell)cell.style.width=`${size}px`});
+      }else{
+        if(state.merged)state.cell.style.height=`${size}px`;
+        else [...state.row.cells].forEach(cell=>cell.style.height=`${size}px`);
+      }
+    }
+    function finishTableResize(){window.removeEventListener('pointermove',resizeTable);tableResizeState=null;document.body.style.userSelect='';rememberRichSelection()}
+    function resetTableCellSize(){
+      const cell=selectedTableCell,table=cell?.closest('.study-table');if(!cell||!table)return;
+      const grid=buildTableGrid(table),position=tableCellPosition(grid,cell);if(!position)return;
+      if(cell.colSpan>1)cell.style.width='';else{const changed=new Set();grid.forEach(row=>{const current=row[position.column];if(current&&!changed.has(current)){current.style.width='';changed.add(current)}})}
+      if(cell.rowSpan>1)cell.style.height='';else [...cell.closest('tr').cells].forEach(current=>current.style.height='');
+    }
+    function openTableDialog(){const dialog=$('#tableDialog'),host=$('#conceptDialog');if(dialog.parentElement!==host)host.append(dialog);renderTableGrid();dialog.classList.add('table-layer');dialog.setAttribute('open','')}
+    function closeTableDialog(){const dialog=$('#tableDialog');dialog.removeAttribute('open');dialog.classList.remove('table-layer')}
+    function insertTable(){const rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3)),editor=activeRichEditor||$('#definitionInput'),table=makeStudyTable(rows,columns);editor.focus();const range=richSelection;if(range&&editor.contains(range.commonAncestorContainer)){range.deleteContents();range.insertNode(table);const after=document.createElement('p');after.innerHTML='<br>';table.after(after);const nextRange=document.createRange(),selection=window.getSelection();nextRange.setStart(after,0);nextRange.collapse(true);selection.removeAllRanges();selection.addRange(nextRange);richSelection=nextRange.cloneRange()}else editor.append(table,document.createElement('p'));closeTableDialog();selectTableCell(null)}
+    function tableAction(action){const cell=selectedTableCell;if(!cell?.isConnected)return;const row=cell.closest('tr'),table=cell.closest('table');if(!row||!table)return;if(action==='merge'){mergeSelectedTableCells();return}if(action==='unmerge'){unmergeSelectedTableCell();return}if(action==='reset-size'){resetTableCellSize();return}if(action==='add-row'){addTableRow(table,cell);return}if(action==='add-column'){addTableColumn(table,cell);return}if(['remove-row','remove-column'].includes(action)&&tableHasMergedCells(table))return;const column=[...row.cells].indexOf(cell);if(action==='remove-row'&&table.rows.length>1){const next=row.nextElementSibling||row.previousElementSibling;row.remove();selectTableCell(next.cells[Math.min(column,next.cells.length-1)])}if(action==='remove-column'&&row.cells.length>1){[...table.rows].forEach(currentRow=>currentRow.cells[column].remove());selectTableCell(table.rows[Math.min(row.rowIndex,table.rows.length-1)].cells[Math.min(column,table.rows[0].cells.length-1)])}if(action==='align-left')cell.style.textAlign='left';if(action==='align-center')cell.style.textAlign='center';if(action==='align-right')cell.style.textAlign='right';if(action==='align-top')cell.style.verticalAlign='top';if(action==='align-middle')cell.style.verticalAlign='middle';if(action==='align-bottom')cell.style.verticalAlign='bottom';if(action==='borders')table.classList.toggle('no-borders');if(action==='clear-fill')cell.style.backgroundColor=''}
+    function renderTableGrid(){const grid=$('#tableSizeGrid'),rows=Math.max(1,Math.min(12,Number($('#tableRows').value)||3)),columns=Math.max(1,Math.min(12,Number($('#tableColumns').value)||3));grid.innerHTML=Array.from({length:36},(_,index)=>{const row=Math.floor(index/6)+1,column=index%6+1;return `<button type="button" class="${row<=rows&&column<=columns?'selected':''}" data-table-size="${row},${column}" title="${row} × ${column}"></button>`}).join('');grid.querySelectorAll('[data-table-size]').forEach(button=>button.onclick=()=>{const [row,column]=button.dataset.tableSize.split(',');$('#tableRows').value=row;$('#tableColumns').value=column;renderTableGrid()})}
+    function mountTableTools(){document.querySelectorAll('.editor-toolbar').forEach(toolbar=>{const group=toolbar.querySelector('.toolbar-symbols');if(!group)return;if(!group.querySelector('[data-insert-table]')){const insertButton=document.createElement('button');insertButton.type='button';insertButton.dataset.insertTable='';insertButton.textContent='▦';insertButton.title='Insertar tabla';insertButton.addEventListener('pointerdown',event=>{event.preventDefault();rememberRichSelection();openTableDialog()});group.prepend(insertButton)}let tools=toolbar.querySelector('.table-tools');if(!tools){tools=document.createElement('span');tools.className='table-tools';tools.hidden=true;tools.innerHTML='<button type="button" data-table-action="add-row" title="Agregar fila">＋F</button><button type="button" data-table-action="remove-row" title="Quitar fila">−F</button><button type="button" data-table-action="add-column" title="Agregar columna">＋C</button><button type="button" data-table-action="remove-column" title="Quitar columna">−C</button><button type="button" data-table-action="merge" title="Combinar: seleccioná con Shift + clic">⧉</button><button type="button" data-table-action="unmerge" title="Separar celda combinada">⊟</button><button type="button" data-table-action="reset-size" title="Restablecer ancho y alto">↺</button><input class="table-fill" type="color" value="#ffffff" data-table-fill title="Color de fondo"><button type="button" data-table-action="clear-fill" title="Quitar color de fondo">⊘</button><button type="button" data-table-action="borders" title="Mostrar u ocultar bordes">▦</button><button type="button" class="table-align" data-table-action="align-left" title="Alinear a la izquierda"><span class="align-lines align-left"><i></i><i></i><i></i><i></i></span></button><button type="button" class="table-align" data-table-action="align-center" title="Centrar"><span class="align-lines align-center"><i></i><i></i><i></i><i></i></span></button><button type="button" class="table-align" data-table-action="align-right" title="Alinear a la derecha"><span class="align-lines align-right"><i></i><i></i><i></i><i></i></span></button><button type="button" data-table-action="align-top" title="Alinear arriba">↥</button><button type="button" data-table-action="align-middle" title="Centrar verticalmente">↕</button><button type="button" data-table-action="align-bottom" title="Alinear abajo">↧</button>';group.after(tools);tools.querySelectorAll('[data-table-action]').forEach(button=>button.onclick=()=>tableAction(button.dataset.tableAction));tools.querySelector('[data-table-fill]').oninput=event=>{if(selectedTableCell?.isConnected)selectedTableCell.style.backgroundColor=event.target.value}}});$('#closeTableDialog').onclick=closeTableDialog;$('#cancelTableButton').onclick=closeTableDialog;$('#insertTableButton').onclick=insertTable;$('#tableRows').oninput=renderTableGrid;$('#tableColumns').oninput=renderTableGrid}
     function makeFormulaNode(latex){const node=document.createElement('math-span');node.className='formula-inline';node.dataset.latex=latex;node.setAttribute('contenteditable','false');node.setAttribute('title','Doble clic para editar la fórmula');node.textContent=latex;return node}
     function clearFormulaState(){formulaInsertRange=null;formulaTargetEditor=null;editingFormulaNode=null;window.mathVirtualKeyboard?.hide()}
     function formulaKey(label,insert=null,extra={}){return{label,insert,...extra}}
@@ -248,7 +359,7 @@
     function renderSubjectChoices(){const subjects=allSubjects();$('#subjectsList').innerHTML=subjects.map(s=>`<option value="${esc(s)}"></option>`).join('')}
     function renderTagSuggestions(){const current=new Set(tagInputValues()),subject=$('#subjectInput').value.trim(),tags=allTags().filter(t=>t!==subject);$('#tagSuggestions').innerHTML=tags.length?tags.map(tag=>`<button type="button" class="${current.has(tag)?'selected':''}" data-suggested-tag="${esc(tag)}">${current.has(tag)?'✓ ':''}#${esc(tag)}</button>`).join(''):'<span class="hint">Los hashtags que vayas creando aparecerán acá.</span>';$('#tagSuggestions').querySelectorAll('[data-suggested-tag]').forEach(button=>button.onclick=()=>{const tag=button.dataset.suggestedTag,values=tagInputValues(),index=values.indexOf(tag);if(index>=0)values.splice(index,1);else values.push(tag);$('#tagsInput').value=values.join(', ');renderTagSuggestions()})}
     function renderLinkTargets(){const options=conceptTerms().map(c=>`<option value="${esc(c.id)}">${esc(c.term)}</option>`).join('');document.querySelectorAll('[data-link-target]').forEach(select=>{const selected=select.value;select.innerHTML=`<option value="">Vincular a…</option>${options}`;select.value=selected})}
-    function openEditor(id=null){editingId=id;const c=id&&concepts.find(x=>x.id===id);$('#dialogTitle').textContent=c?'Editar concepto':'Nuevo concepto';$('#termInput').value=c?.term||'';$('#definitionInput').innerHTML=richHtml(c?.definition||'');$('#notesInput').innerHTML=richHtml(c?.notes||'');$('#subjectInput').value=subjectOf(c||{});$('#tagsInput').value=(c?.tags||[]).filter(t=>t!==subjectOf(c||{})).join(', ');$('#imageInput').value='';renderSubjectChoices();renderTagSuggestions();renderLinkTargets();renderImagePreviews(c?.images||[]);$('#deleteButton').hidden=!c;$('#conceptDialog').showModal();$('#termInput').focus()}
+    function openEditor(id=null){selectTableCell(null);editingId=id;const c=id&&concepts.find(x=>x.id===id);$('#dialogTitle').textContent=c?'Editar concepto':'Nuevo concepto';$('#termInput').value=c?.term||'';$('#definitionInput').innerHTML=richHtml(c?.definition||'');$('#notesInput').innerHTML=richHtml(c?.notes||'');$('#subjectInput').value=subjectOf(c||{});$('#tagsInput').value=(c?.tags||[]).filter(t=>t!==subjectOf(c||{})).join(', ');$('#imageInput').value='';renderSubjectChoices();renderTagSuggestions();renderLinkTargets();renderImagePreviews(c?.images||[]);$('#deleteButton').hidden=!c;$('#conceptDialog').showModal();$('#termInput').focus()}
     function shuffle(items){return [...items].sort(()=>Math.random()-.5)}
     function renderFlashTags(){const chosen=$('#flashAll').checked;$('#flashTags').innerHTML=allTags().map(t=>`<label><input type="checkbox" value="${esc(t)}" ${chosen?'disabled':''}> #${esc(t)}</label>`).join('')}
     function setOverlay(id,open){const overlay=$('#'+id);overlay.hidden=!open;overlay.style.display=open?'grid':'none'}
@@ -327,10 +438,10 @@
           return;
         }
         if(isTable||isTableCell){
-          const textAlign=node.style.textAlign,verticalAlign=node.style.verticalAlign,backgroundColor=node.style.backgroundColor,fontSize=node.style.fontSize;
+          const textAlign=node.style.textAlign,verticalAlign=node.style.verticalAlign,backgroundColor=node.style.backgroundColor,fontSize=node.style.fontSize,width=node.style.width,height=node.style.height,colSpan=isTableCell?Number(node.getAttribute('colspan')):1,rowSpan=isTableCell?Number(node.getAttribute('rowspan')):1;
           [...node.attributes].forEach(a=>node.removeAttribute(a.name));
           if(isTable)node.setAttribute('class',`study-table${tableWithoutBorders?' no-borders':''}`);
-          if(isTableCell){if(textAlign)node.style.textAlign=textAlign;if(verticalAlign)node.style.verticalAlign=verticalAlign;if(backgroundColor)node.style.backgroundColor=backgroundColor;if(fontSize)node.style.fontSize=fontSize}
+          if(isTableCell){if(textAlign)node.style.textAlign=textAlign;if(verticalAlign)node.style.verticalAlign=verticalAlign;if(backgroundColor)node.style.backgroundColor=backgroundColor;if(fontSize)node.style.fontSize=fontSize;if(width)node.style.width=width;if(height)node.style.height=height;if(Number.isInteger(colSpan)&&colSpan>1)node.setAttribute('colspan',String(colSpan));if(Number.isInteger(rowSpan)&&rowSpan>1)node.setAttribute('rowspan',String(rowSpan))}
           return;
         }
         [...node.attributes].forEach(a=>node.removeAttribute(a.name));
@@ -511,14 +622,18 @@
         editor.addEventListener('blur',()=>{setTimeout(()=>{if(document.activeElement?.closest?.('.editor-toolbar'))return;editor.innerHTML=autoLinkConcepts(editor.innerHTML)},0)});
         let longPressTimer=null;
         editor.addEventListener('pointerdown',event=>{
+          const resizeTarget=tableResizeTarget(event);
+          if(resizeTarget){activeRichEditor=editor;startTableResize(event,resizeTarget);return}
           const node=event.target.closest?.('math-field.formula-inline');
           if(!node)return;
           activeRichEditor=editor;selectFormula(node);
           if(event.pointerType==='touch')longPressTimer=setTimeout(()=>{longPressTimer=null;openFormulaEditor(node)},520);
         });
+        editor.addEventListener('pointermove',event=>{if(tableResizeState)return;const target=tableResizeTarget(event);editor.style.cursor=target?(target.axis==='column'?'col-resize':'row-resize'):''});
+        editor.addEventListener('pointerleave',()=>{if(!tableResizeState)editor.style.cursor=''});
         editor.addEventListener('pointerup',()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}});
         editor.addEventListener('pointercancel',()=>{if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}});
-        editor.addEventListener('click',event=>{const link=event.target.closest?.('a.concept-link');if(link){event.preventDefault();openLinkedConcept(link.dataset.conceptId);return}const cell=event.target.closest?.('td,th');if(cell?.closest('.study-table'))selectTableCell(cell)});
+        editor.addEventListener('click',event=>{const link=event.target.closest?.('a.concept-link');if(link){event.preventDefault();openLinkedConcept(link.dataset.conceptId);return}const cell=event.target.closest?.('td,th');if(cell?.closest('.study-table'))selectTableCell(cell,event.shiftKey)});
         editor.addEventListener('focusin',event=>{const cell=event.target.closest?.('td,th');if(cell?.closest('.study-table'))selectTableCell(cell)});
         editor.addEventListener('dblclick',event=>{
           const node=event.target.closest?.('math-field.formula-inline');
@@ -532,9 +647,9 @@
       document.querySelectorAll('[data-copy-format]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();copyFormat()}));
       document.querySelectorAll('[data-apply-format]').forEach(button=>button.addEventListener('mousedown',event=>{event.preventDefault();applyCopiedFormat()}));
       document.querySelectorAll('[data-font-size]').forEach(select=>{
-        // A native <select> takes focus before "change". Save the text range
-        // at pointer-down so applying Chico/Grande still targets the selection.
-        select.addEventListener('pointerdown',rememberRichSelection);
+        // Apply the option already shown before opening the native menu.
+        // Re-applying on click would make Chrome close that menu immediately.
+        select.addEventListener('pointerdown',()=>{rememberRichSelection();applyFontSize(select.value)});
         select.addEventListener('mousedown',rememberRichSelection);
         select.addEventListener('change',()=>applyFontSize(select.value));
       });
@@ -563,7 +678,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=13', { updateViaCache: 'none' });
+        navigator.serviceWorker.register('./sw.js?v=26', { updateViaCache: 'none' });
       });
     }
   </script>
